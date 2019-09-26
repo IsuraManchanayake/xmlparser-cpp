@@ -1,0 +1,10 @@
+<students>
+    <student>
+        <name>Isura</name>
+        <age>24</age>
+    </student>
+    <student>
+        <name>John Doe</name>
+        <age>30</age>
+    </student>
+</students>
