@@ -1,0 +1,10 @@
+<vehicles>
+    <vehicle>
+        <name>Car</name>
+        <pax>4</pax>
+    </vehicle>
+    <vehicle>
+        <name>Bike</name>
+        <pax>2</pax>
+    </vehicle>
+</vehicles>

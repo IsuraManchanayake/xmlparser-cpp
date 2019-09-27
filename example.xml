@@ -7,4 +7,6 @@
         <name>John Doe</name>
         <age>30</age>
     </student>
+    <special/>
+    Hi!!
 </students>
