@@ -4,9 +4,10 @@
         <age>24</age>
     </student>
     <student>
-        <name>John Doe</name>
+        <name>  John Doe</name>
         <age>30</age>
-    </student>
-    <special/>
+    </student     >
+    <special     
+    />
     Hi!!
 </students>

@@ -19,13 +19,17 @@ enum class TokenKind {
 };
 
 struct Token {
-  std::string str;
-  TokenKind kind;
-  Token(TokenKind kind) : kind(kind) {}
-  Token(TokenKind kind, std::string str) : kind(kind), str(std::move(str)) {}
+  const std::string str;
+  const TokenKind kind;
+  const size_t line;
+  const size_t col;
+  Token(TokenKind kind, size_t line, size_t col)
+      : kind(kind), line(line), col(col) {}
+  Token(TokenKind kind, std::string str, size_t line, size_t col)
+      : kind(kind), str(std::move(str)), line(line), col(col) {}
   Token(TokenKind kind, std::string::const_iterator start,
-        std::string::const_iterator end)
-      : kind(kind), str(start, end) {}
+        std::string::const_iterator end, size_t line, size_t col)
+      : kind(kind), str(start, end), line(line), col(col) {}
 };
 
 #define TOKEN_OUT(tok_name)                                                    \
@@ -49,7 +53,8 @@ std::ostream &operator<<(std::ostream &os, const TokenKind &tokenKind) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Token &token) {
-  return os << "{Token kind:[" << token.kind << "] str:[" << token.str << "]}";
+  return os << "{Token(" << token.line << ':' << token.col << ") kind:["
+            << token.kind << "] str:[" << token.str << "]}";
 }
 
 #undef TOKEN_OUT

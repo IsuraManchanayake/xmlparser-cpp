@@ -10,10 +10,11 @@
 struct SyntaxError : public std::exception {
   const std::string file_name;
   const size_t line;
+  mutable std::string message;
 
   SyntaxError(std::string file_name, size_t line)
-      : file_name(file_name), line(line) {}
-  virtual ~SyntaxError() {}
+      : file_name(file_name), line(line), message() {}
+  virtual ~SyntaxError() throw() {}
   virtual const char *what() const throw() = 0;
   std::string errorHeader() const {
     std::stringstream ss;
@@ -30,11 +31,12 @@ struct TokenNotFoundError : public SyntaxError {
                      TokenKind found)
       : SyntaxError(file_name, line), expected(expected), found(found) {}
 
-  virtual const char *what() const throw() {
+  const char *what() const throw() {
     std::stringstream ss;
     ss << errorHeader() << ":Expected token {" << expected << "} But found {"
        << found << '}';
-    return ss.str().c_str();
+    message = ss.str();
+    return message.c_str();
   }
 };
 
@@ -45,22 +47,28 @@ struct ReachedEOFError : public SyntaxError {
       : SyntaxError(file_name, line),
         remainingTagsInStack(remainingTagsInStack) {}
 
-  virtual const char *what() const throw() {
+  const char *what() const throw() {
     std::stringstream ss;
     ss << errorHeader() << ":Reached EOF while having " << remainingTagsInStack
        << " tags remaining in the stack";
-    return ss.str().c_str();
+    message = ss.str();
+    return message.c_str();
   }
 };
 
 struct BadTagError : public SyntaxError {
   const std::string expectedTag;
-  BadTagError(std::string file_name, size_t line, std::string expectedTag)
-      : SyntaxError(file_name, line), expectedTag(std::move(expectedTag)) {}
+  const std::string found;
+  BadTagError(std::string file_name, size_t line, std::string expectedTag,
+              std::string found)
+      : SyntaxError(file_name, line), expectedTag(std::move(expectedTag)),
+        found(std::move(found)) {}
 
-  virtual const char *what() const throw() {
+  const char *what() const throw() {
     std::stringstream ss;
-    ss << errorHeader() << ":Expected tag {" << expectedTag << "} end";
-    return ss.str().c_str();
+    ss << errorHeader() << ":Bad complete tag. Expected{" << expectedTag
+       << "}. Found {" << found << "}.";
+    message = ss.str();
+    return message.c_str();
   }
 };

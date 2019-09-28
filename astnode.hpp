@@ -65,7 +65,9 @@ std::ostream &operator<<(std::ostream &os, const Expr *expr) {
       os << "[Expr kind:XML xml:" << expr->xml << "]";
       break;
     }
-    default: { assert(0); }
+    default: {
+      assert(0);
+    }
     }
   }
   return os;
@@ -79,6 +81,11 @@ std::ostream &operator<<(std::ostream &os, const ExprBlock *exprBlock) {
 }
 
 std::ostream &operator<<(std::ostream &os, const XML *xml) {
-  return os << "[XML tag:" << xml->tag << " expr-block:" << xml->exprBlock
-            << "]";
+  os << "[XML tag:" << xml->tag << " expr-block:";
+  if (xml->exprBlock) {
+    os << xml->exprBlock;
+  } else {
+    os << "null";
+  }
+  return os << "]";
 };

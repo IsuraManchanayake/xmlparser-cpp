@@ -16,9 +16,15 @@ public:
         filename(std::move(filename)) {}
 
   void buildSyntaxTree() {
-    XML *xml = parseXML();
-    expectToken(TokenKind::ENDOFFILE);
-    std::cout << xml << '\n';
+    try {
+      XML *xml = parseXML();
+      expectToken(TokenKind::ENDOFFILE);
+      std::cout << xml << '\n';
+    } catch (const SyntaxError &se) {
+      std::cerr << se.what() << std::endl;
+      std::cerr << idx << std::endl;
+    }
+    std::cout << "finished" << std::endl;
   }
 
 private:
@@ -33,11 +39,14 @@ private:
 
   ExprBlock *parseExprBlock() {
     ExprBlock *exprBlock = new ExprBlock();
-    while (!matchToken(TokenKind::LESS, TokenProcessKind::HALT)) {
+    while (matchToken(TokenKind::LESS, TokenProcessKind::HALT) ||
+           matchToken(TokenKind::ELEMENT, TokenProcessKind::HALT) ||
+           matchToken(TokenKind::WHITESPACE)) {
       Expr *expr = new Expr();
       if (matchToken(TokenKind::ELEMENT, TokenProcessKind::HALT)) {
         expr->element = new Element(token->str);
         expr->kind = ExprKind::ELEMENT;
+        nextToken();
       } else {
         expr->xml = parseXML();
         expr->kind = ExprKind::XML;
@@ -49,7 +58,7 @@ private:
 
   XML *parseXML() {
     XML *xml = new XML();
-    while (token->kind == TokenKind::WHITESPACE) {
+    if (token->kind == TokenKind::WHITESPACE) {
       nextToken();
     }
     expectToken(TokenKind::LESS);
@@ -57,22 +66,22 @@ private:
     tagStack.push_back(token->str);
     xml->tag = Tag(token->str);
     nextToken();
-    if (!matchToken(TokenKind::GREAT_SLASH, TokenProcessKind::HALT)) {
-      expectToken(TokenKind::GREAT);
-      xml->exprBlock = parseExprBlock();
-    } else {
+    if (matchToken(TokenKind::GREAT_SLASH, TokenProcessKind::HALT)) {
       tagStack.pop_back();
       nextToken();
+    } else {
+      expectToken(TokenKind::GREAT);
+      xml->exprBlock = parseExprBlock();
+      expectToken(TokenKind::LESS_SLASH);
+      expectToken(TokenKind::ELEMENT, TokenProcessKind::HALT);
+      if (token->str != tagStack.back()) {
+        throw BadTagError(filename, token->line, tagStack.back(), token->str);
+      }
+      tagStack.pop_back();
+      nextToken();
+      expectToken(TokenKind::GREAT);
     }
-    expectToken(TokenKind::LESS_SLASH);
-    expectToken(TokenKind::ELEMENT, TokenProcessKind::HALT);
-    if(token->str != tagStack.back()) {
-      throw BadTagError(filename, 0, tagStack.back());
-    }
-    tagStack.pop_back();
-    nextToken();
-    expectToken(TokenKind::GREAT);
-    while (token->kind == TokenKind::WHITESPACE) {
+    if (token->kind == TokenKind::WHITESPACE) {
       nextToken();
     }
     return xml;
@@ -82,7 +91,7 @@ private:
     if (idx < tokens.size() - 1) {
       token = &tokens[++idx];
     } else if (!tagStack.empty()) {
-      throw ReachedEOFError(filename, 0, tagStack.size());
+      throw ReachedEOFError(filename, token->line, tagStack.size());
     }
   }
 
@@ -100,7 +109,7 @@ private:
   void expectToken(TokenKind kind,
                    TokenProcessKind process = TokenProcessKind::PASS) const {
     if (!matchToken(kind, TokenProcessKind::HALT)) {
-      throw TokenNotFoundError(filename, 0, kind, token->kind);
+      throw TokenNotFoundError(filename, token->line, kind, token->kind);
     }
     if (process == TokenProcessKind::PASS) {
       nextToken();
