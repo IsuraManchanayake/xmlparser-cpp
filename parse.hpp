@@ -12,16 +12,17 @@ public:
   const std::string filename;
 
   Parser(std::string filename, const std::vector<Token> &tokens)
-      : tokens(tokens), filename(std::move(filename)), idx(0), token(&tokens[0])
-         {}
+      : tokens(tokens), filename(std::move(filename)), idx(0),
+        token(&tokens[0]) {}
 
-  XML* buildSyntaxTree() {
-    XML* xml = nullptr;
+  XML *buildSyntaxTree() {
+    XML *xml = nullptr;
     try {
       xml = parseXML();
       expectToken(TokenKind::ENDOFFILE, TokenProcessKind::HALT);
-      if(!tagStack.empty()) {
-        throw UnClosedTagError(filename, token->line, tagStack.size(), tagStack.back());
+      if (!tagStack.empty()) {
+        throw UnClosedTagError(filename, token->line, tagStack.size(),
+                               tagStack.back());
       }
     } catch (const SyntaxError &se) {
       std::cerr << se.what() << std::endl;

@@ -83,7 +83,7 @@ struct UnClosedTagError : public SyntaxError {
 
   const char *what() const throw() {
     std::stringstream ss;
-    ss << errorHeader() << ":Found " << remainingTagCount<< " tags including"
+    ss << errorHeader() << ":Found " << remainingTagCount << " tags including"
        << "{" << lastTag << "}";
     message = ss.str();
     return message.c_str();

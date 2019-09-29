@@ -45,6 +45,16 @@ struct Lexer {
         }
         break;
       }
+      case '=': {
+        _next_char();
+        tokens.emplace_back(TokenKind::EQUALS, line, col);
+        break;
+      }
+      case '\"': {
+        _next_char();
+        tokens.emplace_back(TokenKind::DOUBLE_QUOTE, line, col);
+        break;
+      }
       default: {
         auto start = iter;
         bool ws = true;

@@ -48,7 +48,7 @@ struct XML {
 };
 
 Expr::~Expr() {
-  if(kind == ExprKind::XML) {
+  if (kind == ExprKind::XML) {
     delete xml;
   } else {
     delete element;
@@ -56,14 +56,12 @@ Expr::~Expr() {
 }
 
 ExprBlock::~ExprBlock() {
-  for(auto& expr: exprs) {
+  for (auto &expr : exprs) {
     delete expr;
   }
 }
 
-XML::~XML() {
-  delete exprBlock;
-}
+XML::~XML() { delete exprBlock; }
 
 std::ostream &operator<<(std::ostream &os, const XML *xml);
 
