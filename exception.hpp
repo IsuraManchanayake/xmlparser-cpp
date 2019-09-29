@@ -72,3 +72,20 @@ struct BadTagError : public SyntaxError {
     return message.c_str();
   }
 };
+
+struct UnClosedTagError : public SyntaxError {
+  const size_t remainingTagCount;
+  const std::string lastTag;
+  UnClosedTagError(std::string filename, size_t line, size_t remainingTagCount,
+                   std::string lastTag)
+      : SyntaxError(filename, line), remainingTagCount(remainingTagCount),
+        lastTag(std::move(lastTag)) {}
+
+  const char *what() const throw() {
+    std::stringstream ss;
+    ss << errorHeader() << ":Found " << remainingTagCount<< " tags including"
+       << "{" << lastTag << "}";
+    message = ss.str();
+    return message.c_str();
+  }
+};

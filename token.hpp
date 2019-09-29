@@ -19,8 +19,8 @@ enum class TokenKind {
 };
 
 struct Token {
-  const std::string str;
   const TokenKind kind;
+  const std::string str;
   const size_t line;
   const size_t col;
   Token(TokenKind kind, size_t line, size_t col)

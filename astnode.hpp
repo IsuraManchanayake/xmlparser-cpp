@@ -31,10 +31,12 @@ struct Expr {
     Element *element;
   };
   Expr() : xml(nullptr) {}
+  ~Expr();
 };
 
 struct ExprBlock {
   std::vector<Expr *> exprs;
+  ~ExprBlock();
 };
 
 struct XML {
@@ -42,7 +44,26 @@ struct XML {
   ExprBlock *exprBlock;
 
   XML() : tag(), exprBlock(nullptr) {}
+  ~XML();
 };
+
+Expr::~Expr() {
+  if(kind == ExprKind::XML) {
+    delete xml;
+  } else {
+    delete element;
+  }
+}
+
+ExprBlock::~ExprBlock() {
+  for(auto& expr: exprs) {
+    delete expr;
+  }
+}
+
+XML::~XML() {
+  delete exprBlock;
+}
 
 std::ostream &operator<<(std::ostream &os, const XML *xml);
 

@@ -16,5 +16,8 @@ void test(const std::string &filename) {
     std::cout << i << ' ' << lexer.tokens.container[i] << '\n';
   }
   Parser parser(filename, lexer.tokens.container);
-  parser.buildSyntaxTree();
+  XML* xml = parser.buildSyntaxTree();
+  if(xml) {
+    std::cout << xml << std::endl;
+  }
 }

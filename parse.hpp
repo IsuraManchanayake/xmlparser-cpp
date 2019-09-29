@@ -12,19 +12,22 @@ public:
   const std::string filename;
 
   Parser(std::string filename, const std::vector<Token> &tokens)
-      : tokens(tokens), idx(0), token(&tokens[0]),
-        filename(std::move(filename)) {}
+      : tokens(tokens), filename(std::move(filename)), idx(0), token(&tokens[0])
+         {}
 
-  void buildSyntaxTree() {
+  XML* buildSyntaxTree() {
+    XML* xml = nullptr;
     try {
-      XML *xml = parseXML();
-      expectToken(TokenKind::ENDOFFILE);
-      std::cout << xml << '\n';
+      xml = parseXML();
+      expectToken(TokenKind::ENDOFFILE, TokenProcessKind::HALT);
+      if(!tagStack.empty()) {
+        throw UnClosedTagError(filename, token->line, tagStack.size(), tagStack.back());
+      }
     } catch (const SyntaxError &se) {
       std::cerr << se.what() << std::endl;
       std::cerr << idx << std::endl;
     }
-    std::cout << "finished" << std::endl;
+    return xml;
   }
 
 private:
