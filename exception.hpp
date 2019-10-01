@@ -41,16 +41,12 @@ struct TokenNotFoundError : public SyntaxError {
 };
 
 struct ReachedEOFError : public SyntaxError {
-  const size_t remainingTagsInStack;
-  ReachedEOFError(std::string file_name, size_t line,
-                  size_t remainingTagsInStack)
-      : SyntaxError(file_name, line),
-        remainingTagsInStack(remainingTagsInStack) {}
+  ReachedEOFError(std::string file_name, size_t line)
+      : SyntaxError(file_name, line) {}
 
   const char *what() const throw() {
     std::stringstream ss;
-    ss << errorHeader() << ":Reached EOF while having " << remainingTagsInStack
-       << " tags remaining in the stack";
+    ss << errorHeader() << ":Reached EOF";
     message = ss.str();
     return message.c_str();
   }
@@ -68,6 +64,20 @@ struct BadTagError : public SyntaxError {
     std::stringstream ss;
     ss << errorHeader() << ":Bad complete tag. Expected{" << expectedTag
        << "}. Found {" << found << "}.";
+    message = ss.str();
+    return message.c_str();
+  }
+};
+
+struct UnknownEscapeCharacterError : public SyntaxError {
+  const char unknownChar;
+  UnknownEscapeCharacterError(std::string filename, size_t line,
+                              char unknownChar)
+      : SyntaxError(filename, line), unknownChar(unknownChar) {}
+  
+  const char *what() const throw() {
+    std::stringstream ss;
+    ss << errorHeader() << ":Unknown escape character(\\" << unknownChar << ")";
     message = ss.str();
     return message.c_str();
   }

@@ -10,14 +10,15 @@ void test(const std::string &filename) {
   std::cout << "testing file: " << filename << '\n';
   std::ifstream ifs(filename);
   std::string source(std::istreambuf_iterator<char>{ifs}, {});
-  Lexer lexer(source, 200);
+  Lexer lexer(filename, source, 200);
   lexer.scan();
   for (size_t i = 0; i < lexer.tokens.container.size(); i++) {
     std::cout << i << ' ' << lexer.tokens.container[i] << '\n';
   }
-  Parser parser(filename, lexer.tokens.container);
+  XMLParser parser(filename, lexer.tokens.container);
   XML *xml = parser.buildSyntaxTree();
   if (xml) {
     std::cout << xml << std::endl;
   }
+  delete xml;
 }

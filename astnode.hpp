@@ -7,11 +7,19 @@
 
 struct XML;
 
+struct Attribute {
+  std::string name;
+  std::string value;
+  Attribute(std::string name, std::string value)
+      : name(std::move(name)), value(std::move(value)) {}
+};
+
 struct Tag {
   std::string name;
-  // std::vector<Attribute*> attrs;
+  std::vector<Attribute *> attrs;
   Tag(std::string name) : name(std::move(name)) {}
   Tag() : name() {}
+  ~Tag();
 };
 
 struct Element {
@@ -40,12 +48,18 @@ struct ExprBlock {
 };
 
 struct XML {
-  Tag tag;
+  Tag *tag;
   ExprBlock *exprBlock;
 
-  XML() : tag(), exprBlock(nullptr) {}
+  XML() : tag(nullptr), exprBlock(nullptr) {}
   ~XML();
 };
+
+Tag::~Tag() {
+  for (auto &attr : attrs) {
+    delete attr;
+  }
+}
 
 Expr::~Expr() {
   if (kind == ExprKind::XML) {
@@ -61,12 +75,23 @@ ExprBlock::~ExprBlock() {
   }
 }
 
-XML::~XML() { delete exprBlock; }
+XML::~XML() {
+  delete tag;
+  delete exprBlock;
+}
 
 std::ostream &operator<<(std::ostream &os, const XML *xml);
 
-std::ostream &operator<<(std::ostream &os, const Tag &tag) {
-  return os << "[Tag name:" << tag.name << "]";
+std::ostream &operator<<(std::ostream& os, const Attribute* attr) {
+  return os << "[Attr name:" << attr->name << " value:" << attr->value << "]";
+}
+
+std::ostream &operator<<(std::ostream &os, const Tag *tag) {
+  os << "[Tag name:" << tag->name << ' ';
+  for(const auto& attr: tag->attrs) {
+    os << attr << ' ';
+  }
+  return os << "]";
 }
 
 std::ostream &operator<<(std::ostream &os, const Element *element) {
@@ -84,9 +109,7 @@ std::ostream &operator<<(std::ostream &os, const Expr *expr) {
       os << "[Expr kind:XML xml:" << expr->xml << "]";
       break;
     }
-    default: {
-      assert(0);
-    }
+    default: { assert(0); }
     }
   }
   return os;

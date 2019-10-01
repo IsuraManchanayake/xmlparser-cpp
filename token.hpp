@@ -13,11 +13,13 @@ enum class TokenKind {
   GREAT_SLASH,
   SLASH,
   TAG,
-  EQUALS,
-  DOUBLE_QUOTE,
   ELEMENT,
   WHITESPACE,
   ENDOFFILE,
+  // tag tokens
+  NAME,
+  EQUALS,
+  DOUBLE_QUOTED_STRING,
 };
 
 struct Token {
@@ -47,11 +49,12 @@ std::ostream &operator<<(std::ostream &os, const TokenKind &tokenKind) {
     TOKEN_OUT(GREAT_SLASH);
     TOKEN_OUT(SLASH);
     TOKEN_OUT(TAG);
-    TOKEN_OUT(EQUALS);
-    TOKEN_OUT(DOUBLE_QUOTE);
     TOKEN_OUT(ELEMENT);
     TOKEN_OUT(WHITESPACE);
     TOKEN_OUT(ENDOFFILE);
+    TOKEN_OUT(NAME);
+    TOKEN_OUT(EQUALS);
+    TOKEN_OUT(DOUBLE_QUOTED_STRING);
   }
   return os;
 }

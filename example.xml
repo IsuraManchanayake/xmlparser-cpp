@@ -1,4 +1,4 @@
-<students>
+<students class="A" grade="10">
     <student>
         <name>Isura</name>
         <age>24</age>
